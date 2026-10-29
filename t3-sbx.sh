@@ -6,8 +6,8 @@
 #   bash t3-sbx.sh my-sandbox   # custom sandbox name
 #
 # Or straight from GitHub, without downloading:
-#   curl -fsSL https://raw.githubusercontent.com/Abdelrahman-Qazzaz/t3-sbx/main/t3-sbx.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/Abdelrahman-Qazzaz/t3-sbx/main/t3-sbx.sh | bash -s -- my-sandbox
+#   curl -fsSL https://raw.githubusercontent.com/lepreem/t3-sbx/main/t3-sbx.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/lepreem/t3-sbx/main/t3-sbx.sh | bash -s -- my-sandbox
 #
 # Optional env vars:
 #   AGENT=claude   agent template to base the sandbox on (default: claude)
