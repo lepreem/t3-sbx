@@ -69,7 +69,7 @@ else
 
   if [[ -z "$CREATED" ]]; then
     warn "Non-interactive create didn't work. Falling back to 'sbx run' (interactive)."
-    warn "When the agent session opens, type /exit — the sandbox keeps running."
+    warn "When the agent session opens, type /exit."
     # Read from the terminal directly so this also works when piped via curl | bash.
     read -r -p "Press Enter to continue..." _ </dev/tty
     sbx run --name "$NAME" --kit "${KITS[0]}" "$AGENT" "$PROJECT_DIR" </dev/tty || true
@@ -80,7 +80,14 @@ else
   echo "Created with kit: $CREATED"
 fi
 
-# --- 3. SSH ------------------------------------------------------------------
+# --- 3. Keep it running -----------------------------------------------------
+# A sandbox started by 'sbx create' or an attached 'sbx run' auto-stops ~30s
+# after its last session disconnects, so any SSH hiccup makes T3 Code sit on
+# "reconnecting". Starting it detached tells sbx not to auto-stop it.
+say "Starting sandbox '$NAME' detached (so it doesn't auto-stop)"
+sbx run -d --name "$NAME" >/dev/null || die "Couldn't start '$NAME' detached. Check 'sbx ls'."
+
+# --- 4. SSH ------------------------------------------------------------------
 say "Setting up SSH (safe to repeat)"
 sbx setup ssh
 
@@ -89,7 +96,7 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-
 ssh "${SSH_OPTS[@]}" "$HOST" 'echo "connected as $(whoami)"' \
   || die "Can't SSH into $HOST. Try 'ssh $HOST' manually to see the error."
 
-# --- 4. Make sure T3 can start inside ---------------------------------------
+# --- 5. Make sure T3 can start inside ---------------------------------------
 say "Checking that T3 Code's server can run inside the sandbox"
 if ssh "${SSH_OPTS[@]}" "$HOST" 'command -v t3 >/dev/null 2>&1'; then
   echo "t3 is pre-installed — first connection will be fast."
@@ -105,7 +112,7 @@ fi
 DISK="$(ssh "${SSH_OPTS[@]}" "$HOST" "df -h / | awk 'NR==2 {print \$4}'" 2>/dev/null || echo '?')"
 echo "Free disk in sandbox: $DISK"
 
-# --- 5. Where is the project inside? ----------------------------------------
+# --- 6. Where is the project inside? ----------------------------------------
 # sbx mounts the project at the same absolute path it has on the host.
 # (~/workspace exists too but is an empty folder — don't use it.)
 # Require a non-empty directory so we never point T3 at an empty folder.
