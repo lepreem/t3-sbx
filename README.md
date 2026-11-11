@@ -5,6 +5,7 @@ One command to run [T3 Code](https://github.com/pingdotgg/t3code) agents inside 
 T3 Code has no built-in Docker Sandboxes support yet, but it can connect to a sandbox over SSH. This script does the setup for you:
 
 - creates a sandbox for the current folder, with the T3 Code kit included
+- starts it detached, so it doesn't auto-stop when T3's SSH connection drops
 - turns on SSH access to it
 - checks that the T3 server can start inside, and installs build tools if it can't
 - prints exactly what to type into T3 Code
@@ -57,6 +58,7 @@ Also remove the environment in T3 Code; it doesn't delete the sandbox for you.
 
 ## Troubleshooting
 
+- **T3 Code keeps saying "reconnecting"**: the sandbox probably stopped (check `sbx ls`). Sandboxes started by `sbx create` or an attached `sbx run` auto-stop ~30s after their last session disconnects. Restart it detached with `sbx run -d --name <name>`, or just rerun the script. You also need this after a reboot or `sbx stop`.
 - **"Remote T3 server did not become ready"**: usually missing build tools or a full disk. Rerun the script; it checks both.
 - **SSH test fails**: run `ssh <name>.sbx` yourself to see the error, and make sure `sbx setup ssh` succeeded.
 
