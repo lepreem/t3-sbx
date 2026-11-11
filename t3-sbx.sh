@@ -57,6 +57,14 @@ echo "Sandbox name:   $NAME  (SSH host: $HOST)"
 if sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qx "$NAME"; then
   warn "A sandbox named '$NAME' already exists — reusing it."
 else
+  # Confirm first, so running this from the wrong folder doesn't silently make a new sandbox.
+  # Read from the terminal directly so this also works when piped via curl | bash.
+  warn "No sandbox named '$NAME' exists yet."
+  { exec 3</dev/tty; } 2>/dev/null || die "No terminal to ask on. Run this from an interactive shell."
+  read -r -u 3 -p "Create a new one for $PROJECT_DIR? [y/N] " REPLY || REPLY=""
+  exec 3<&-
+  [[ "$REPLY" =~ ^[Yy]([Ee][Ss])?$ ]] || die "Not creating a sandbox. Run 'sbx ls' to see existing ones."
+
   say "Creating sandbox '$NAME' with the T3 Code kit"
   CREATED=""
   for k in "${KITS[@]}"; do

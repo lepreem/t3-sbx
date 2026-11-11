@@ -4,7 +4,7 @@ One command to run [T3 Code](https://github.com/pingdotgg/t3code) agents inside 
 
 T3 Code has no built-in Docker Sandboxes support yet, but it can connect to a sandbox over SSH. This script does the setup for you:
 
-- creates a sandbox for the current folder, with the T3 Code kit included
+- creates a sandbox for the current folder, with the T3 Code kit included (asks first; reuses an existing sandbox with the same name)
 - starts it detached, so it doesn't auto-stop when T3's SSH connection drops
 - turns on SSH access to it
 - checks that the T3 server can start inside, and installs build tools if it can't
